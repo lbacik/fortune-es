@@ -1,0 +1,23 @@
+{
+    "properties": {
+        "file": {
+            "type": "keyword"
+        },
+        "text": {
+            "type": "text"
+        },
+        "length": {
+            "type": "integer"
+        },
+        "index": {
+            "type": "integer"
+        },
+        "language": {
+            "type": "keyword"
+        },
+        "text-hash": {
+            "type": "text"
+        }
+    }
+}
+

@@ -1,0 +1,7 @@
+ES_HOST=
+ES_USER=elastic
+ES_PASS=
+ES_SCHEME=https
+ES_PORT=443
+
+FORTUNE_API=https://fortune-api.luka.sh/fortune
