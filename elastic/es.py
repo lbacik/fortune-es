@@ -1,6 +1,7 @@
 import os
 import json
-from elasticsearch import Elasticsearch
+import logging
+from elasticsearch import Elasticsearch, logger
 
 
 es: Elasticsearch = None
@@ -11,7 +12,7 @@ def create_connection() -> None:
 
     ES_HOST: str = os.getenv('ES_HOST')
 
-    # print(f'Connecting to Elasticsearch: {ES_HOST}')
+    logging.info(f'Connecting to Elasticsearch: {ES_HOST}')
 
     es = Elasticsearch(
         os.getenv('ES_HOST'),
@@ -19,6 +20,8 @@ def create_connection() -> None:
         scheme=os.getenv('ES_SCHEME'),
         port=os.getenv('ES_PORT'),
     )
+
+    logger.setLevel(logging.ERROR)
 
 
 def ping() -> bool:
@@ -57,8 +60,8 @@ def populate_index(index_name: str, data: list) -> None:
                 body=item,
             )
         except Exception as e:
-            print(e)
-            os.sleep(5)
+            logging.error(e)
+            exit(1)
 
 
 def search(index_name: str, query: dict) -> dict:

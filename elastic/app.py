@@ -1,9 +1,13 @@
 import argparse
 import json
+import logging
 from .es import *
 from .fortune import FortuneClient
 from .populate import populate, root_language_exceptions
 from dotenv import load_dotenv
+
+
+logging.basicConfig(level=logging.INFO)
 
 
 parser : argparse.ArgumentParser = argparse.ArgumentParser()
@@ -69,39 +73,11 @@ if args.create:
     create_index(args.create, {"mappings": mapping})
 
 if args.populate:
+    logging.info('Populating index %s', args.populate)
     populate(args.populate, language_exceptions=root_language_exceptions)
 
 if args.search:
     result = search(args.index, args.search)
     print(json.dumps(result))
-
-
-    # fortune_client = FortuneClient("https://fortune-api.luka.sh/fortune")
-    # data: list = fortune_client.request()
-    # for item in data:
-    #     print(f"Processing {item}")
-    #     if item[-1] == '/':
-    #         continue
-    #     language: str = map_exeptions(item)
-    #     print(f"\tLanguage: {language}")
-    #     fortunes = fortune_client.request(item)
-    #     i: int = 0
-    #     data: list = []
-    #     for fortune in fortunes:
-    #         data.append(
-    #             {
-    #                 "fortune": fortune,
-    #                 "file": item,
-    #                 "index": i,
-    #                 "length": len(fortune),
-    #                 "language": language,
-    #                 "text-hash": str(hash(fortune.encode('utf-8'))),
-    #             }
-    #         )
-    #         i += 1
-    #         print(".", sep="", end="")
-    #     print()
-    #     print("Sending...")
-    #     populate_index(args.populate, data)
 
 

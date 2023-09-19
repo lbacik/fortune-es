@@ -1,4 +1,5 @@
 import os
+import logging
 from .fortune import FortuneClient
 from .es import populate_index
 from dotenv import load_dotenv
@@ -30,16 +31,13 @@ def populate(
         language_exceptions: dict|None = None
     ) -> None:
 
-    print(f"Start processing: {path}, {language}")
+    logging.info(f"Processing: {path}, {language}")
 
     fortune_client = FortuneClient(os.getenv('FORTUNE_API'))
-
     data: list = fortune_client.request(path)
 
     for item in data:
-        print(f"Processing {item}")
         if item[-1] == '/':
-            print ("\tdirectory")
             lang: str = item[:-1]
             new_path = path + item if path is not None else item
             populate(index_name, new_path, lang)
@@ -47,8 +45,6 @@ def populate(
 
         if language_exceptions is not None:
             language = map_exeptions(item, language, language_exceptions)
-
-        print(f"\tLanguage: {language}")
 
         fortune_file_path = path + item if path is not None else item
         fortunes: list = fortune_client.request(fortune_file_path)
@@ -67,9 +63,8 @@ def populate(
                 }
             )
             i += 1
-            print(".", sep="", end="")
+            # print(".", sep="", end="")
 
-        print()
-        print("Sending...")
+        logging.info('language: %s, file: %s, fortunes: %d', language, item, len(data))
         populate_index(index_name, data)
 
