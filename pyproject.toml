@@ -4,6 +4,7 @@ version = "0.1.0"
 description = ""
 authors = ["Łukasz Bacik <mail@luka.sh>"]
 readme = "README.md"
+packages = [{include = "elastic"}]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -11,8 +12,11 @@ elasticsearch = "~7.13.0"
 requests = "^2.30.0"
 python-dotenv = "^1.0.0"
 logging = "^0.4.9.6"
-
+fortune-client = "^0.1.0"
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+fes = 'elastic.app:main'

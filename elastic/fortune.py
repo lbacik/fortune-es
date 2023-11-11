@@ -6,7 +6,7 @@ class FortuneClient:
     def __init__(self, url: str) -> None:
         self.url: str = url
 
-    def request(self, item: str|None = None) -> list:
+    def request(self, item: str | None = None) -> list:
         response: requests.Response
         if item is None:
             response = requests.get(f"{self.url}?explore=1")

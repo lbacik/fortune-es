@@ -2,7 +2,6 @@ import argparse
 import json
 import logging
 from .es import *
-from .fortune import FortuneClient
 from .populate import populate, root_language_exceptions
 from dotenv import load_dotenv
 
@@ -50,34 +49,36 @@ def map_exeptions(item: str) -> str:
     return language
 
 
-if args.env_file:
-    load_dotenv(args.env_file)
-else:
-    load_dotenv()
+def main():
+
+    if args.env_file:
+        load_dotenv(args.env_file)
+    else:
+        load_dotenv()
+
+    create_connection()
+
+    if args.ping:
+        print('PING:', ping())
+
+    if  args.info:
+        print_info()
+
+    if args.indices:
+        print_all_indices()
+
+    if args.create:
+        mapping: dict = file_to_dict(args.mapping)
+        create_index(args.create, {"mappings": mapping})
+
+    if args.populate:
+        logging.info('Populating index %s', args.populate)
+        populate(args.populate, language_exceptions=root_language_exceptions)
+
+    if args.search:
+        result = search(args.index, args.search)
+        print(json.dumps(result))
 
 
-create_connection()
-
-
-if args.ping:
-    print('PING:', ping())
-
-if  args.info:
-    print_info()
-
-if args.indices:
-    print_all_indices()
-
-if args.create:
-    mapping: dict = file_to_dict(args.mapping)
-    create_index(args.create, {"mappings": mapping})
-
-if args.populate:
-    logging.info('Populating index %s', args.populate)
-    populate(args.populate, language_exceptions=root_language_exceptions)
-
-if args.search:
-    result = search(args.index, args.search)
-    print(json.dumps(result))
-
-
+if __name__ == '__main__':
+    main()

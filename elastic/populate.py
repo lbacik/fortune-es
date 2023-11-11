@@ -1,6 +1,6 @@
 import os
 import logging
-from .fortune import FortuneClient
+from fortune_client import get_data, Parameters
 from .es import populate_index
 from dotenv import load_dotenv
 
@@ -26,36 +26,40 @@ def map_exeptions(item: str, default_language: str, language_exceptions: dict) -
 
 def populate(
         index_name: str,
-        path: str|None = None,
+        path: str | None = None,
         language: str = 'en',
-        language_exceptions: dict|None = None
+        language_exceptions: dict | None = None
     ) -> None:
 
     logging.info(f"Processing: {path}, {language}")
 
-    fortune_client = FortuneClient(os.getenv('FORTUNE_API'))
-    data: list = fortune_client.request(path)
+    if path is None:
+        path = ''
+
+    data = get_data(Parameters(
+        url=os.getenv('FORTUNE_API'),
+        explore=True,
+        recursive=False,
+        path=(path,),
+        index=None,
+    ))
 
     for item in data:
-        if item[-1] == '/':
-            lang: str = item[:-1]
-            new_path = path + item if path is not None else item
-            populate(index_name, new_path, lang)
+        if item.isDirectory:
+            for fortune_path in item.content:
+                populate(index_name, item.path + fortune_path, language)
             continue
 
         if language_exceptions is not None:
-            language = map_exeptions(item, language, language_exceptions)
-
-        fortune_file_path = path + item if path is not None else item
-        fortunes: list = fortune_client.request(fortune_file_path)
+            language = map_exeptions(item.path, language, language_exceptions)
 
         i: int = 0
         data: list = []
-        for fortune in fortunes:
+        for fortune in item.content:
             data.append(
                 {
                     "fortune": fortune,
-                    "file": item,
+                    "file": item.path,
                     "index": i,
                     "length": len(fortune),
                     "language": language,
@@ -63,8 +67,7 @@ def populate(
                 }
             )
             i += 1
-            # print(".", sep="", end="")
 
-        logging.info('language: %s, file: %s, fortunes: %d', language, item, len(data))
+        logging.info('language: %s, file: %s, fortunes: %d', language, item.path, len(data))
         populate_index(index_name, data)
 
