@@ -15,7 +15,7 @@ root_language_exceptions: dict[str, str] = {
 }
 
 
-def map_exeptions(item: str, default_language: str, language_exceptions: dict) -> str:
+def map_exceptions(item: str, default_language: str, language_exceptions: dict) -> str:
     try:
         language: str = language_exceptions[item]
     except KeyError:
@@ -31,7 +31,7 @@ def populate(
         language_exceptions: dict | None = None
     ) -> None:
 
-    logging.info(f"Processing: {path}, {language}")
+    logging.info(f"Processing: {path}")
 
     if path is None:
         path = ''
@@ -50,8 +50,11 @@ def populate(
                 populate(index_name, item.path + fortune_path, language)
             continue
 
-        if language_exceptions is not None:
-            language = map_exeptions(item.path, language, language_exceptions)
+        first_path_element = item.path.split('/')[0]
+        if len(first_path_element) == 2:
+            language = first_path_element
+        elif language_exceptions is not None:
+            language = map_exceptions(item.path, language, language_exceptions)
 
         i: int = 0
         data: list = []
