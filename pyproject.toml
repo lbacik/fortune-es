@@ -9,7 +9,7 @@ packages = [{include = "elastic"}]
 [tool.poetry.dependencies]
 python = "^3.11"
 elasticsearch = "~7.13.0"
-requests = "^2.30.0"
+requests = "^2.32"
 python-dotenv = "^1.0.0"
 logging = "^0.4.9.6"
 fortune-client = "^0.1.0"
